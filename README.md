@@ -373,3 +373,5 @@ sessionStorage →  persiste solo mientras dure la pestaña
 > Investiga cómo combinar `localStorage` con `useState` o `useEffect` dentro del `CartProvider` para que el carrito se guarde y se recupere automáticamente. Es un reto que os proponemos resolver por vuestra cuenta.
 >
 > **Pista extra:** ¿podría ser esto un custom hook llamado `useLocalStorage`?
+   
+ 
