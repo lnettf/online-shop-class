@@ -11,7 +11,6 @@ Proyecto de práctica para el curso de React. Consiste en una tienda online con 
 
 ```bash
 npm install
-npm install react-router-dom axios
 ```
 
 ## Levantar la aplicación
@@ -33,87 +32,84 @@ Este comando levanta **dos servidores al mismo tiempo**:
 
 ## Enrutado con React Router
 
-La aplicación tiene dos rutas:
+La aplicación usa `createBrowserRouter` de React Router v6. El router está definido en `src/router/router.jsx` y se monta en `main.jsx` con `RouterProvider`.
 
-| Ruta            | Descripción                     |
-| --------------- | ------------------------------- |
-| `/`             | Listado de todos los productos  |
-| `/products/:id` | Detalle de un producto concreto |
+| Ruta               | Componente       | Descripción                     |
+| ------------------ | ---------------- | ------------------------------- |
+| `/`                | `Home`           | Listado de todos los productos  |
+| `/product/:productId` | `ProductDetail` | Detalle de un producto concreto |
+| `*`                | `Error`          | Página 404 para rutas no encontradas |
 
-**Configuración básica en `App.jsx`:**
+**Configuración del router (`src/router/router.jsx`):**
 
 ```jsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ProductList from "./pages/ProductList";
-import ProductDetail from "./pages/ProductDetail";
+import { createBrowserRouter } from "react-router-dom";
+import { Home } from "../pages/home/Home";
+import { ProductDetail } from "../pages/productDetail/ProductDetail";
+import { Error } from "../pages/error/Error";
 
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<ProductList />} />
-        <Route path="/products/:id" element={<ProductDetail />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+export const router = createBrowserRouter([
+  { path: "/", element: <Home /> },
+  { path: "/product/:productId", element: <ProductDetail /> },
+  { path: "*", element: <Error /> },
+]);
 ```
 
-Para navegar al detalle desde una tarjeta se usa `useNavigate` o el componente `<Link>`:
+**Montar el router en `main.jsx`:**
+
+```jsx
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router/router";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <RouterProvider router={router} />
+  </StrictMode>
+);
+```
+
+Para navegar al detalle desde una tarjeta se usa el componente `<Link>`:
 
 ```jsx
 import { Link } from "react-router-dom";
 
-<Link to={`/products/${product.id}`}>Ver detalle</Link>;
+<Link to={`product/${product.id}`}>Ver detalle</Link>
 ```
 
-Para leer el `:id` de la URL en la página de detalle se usa `useParams`:
+Para leer el `:productId` de la URL en la página de detalle se usa `useParams`:
 
 ```jsx
 import { useParams } from "react-router-dom";
 
-const { id } = useParams();
+const { productId } = useParams();
 ```
 
 ---
 
 ## Peticiones HTTP con Axios
 
-Instalar: `npm install axios`
+Las peticiones están encapsuladas en archivos de servicio, separados de los hooks y los componentes.
 
-**Listado de productos:**
+**Servicio de listado (`src/pages/home/services/productList.js`):**
 
-```jsx
+```js
 import axios from "axios";
-import { useEffect, useState } from "react";
 
-function ProductList() {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3001/products")
-      .then((res) => setProducts(res.data));
-  }, []);
-}
+export const productList = async () => {
+  const response = await axios.get("http://localhost:3001/products/");
+  return response.data;
+};
 ```
 
-**Detalle de producto:**
+**Servicio de detalle (`src/pages/productDetail/services/productDetail.js`):**
 
-```jsx
+```js
 import axios from "axios";
-import { useParams } from "react-router-dom";
 
-function ProductDetail() {
-  const { id } = useParams();
-  const [product, setProduct] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get(`http://localhost:3001/products/${id}`)
-      .then((res) => setProduct(res.data));
-  }, [id]);
-}
+export const productDetailService = async (productId) => {
+  const response = await axios.get(`http://localhost:3001/products/${productId}`);
+  return response.data;
+};
 ```
 
 ---
@@ -157,146 +153,128 @@ https://picsum.photos/seed/macbook/300/500   → imagen vertical
 
 ## Estructura del proyecto
 
-Se propone la siguiente organización. **Es importante mantenerla limpia y bien separada** — cada archivo debe tener una responsabilidad clara.
+Cada página tiene su propio directorio con sus componentes, hooks y servicios. La lógica de obtención de datos queda completamente separada de la vista.
 
 ```
 online-shop/
 ├── db.json
 ├── src/
-│   ├── main.jsx
-│   ├── App.jsx                          # Solo rutas, nada más
+│   ├── main.jsx                              # Punto de entrada, monta RouterProvider
+│   ├── index.css
 │   │
-│   ├── pages/                           # Una página por ruta
-│   │   ├── ProductListPage.jsx
-│   │   └── ProductDetailPage.jsx
+│   ├── router/
+│   │   └── router.jsx                        # Definición de rutas con createBrowserRouter
 │   │
-│   ├── components/                      # Componentes reutilizables
-│   │   ├── ProductList/
-│   │   │   ├── ProductList.jsx          # Grid o lista de tarjetas
-│   │   │   └── ProductCard.jsx          # Una sola tarjeta de producto
-│   │   │
-│   │   └── ProductDetail/
-│   │       ├── ProductDetail.jsx        # Contenedor del detalle
-│   │       ├── ProductImage.jsx         # Solo la imagen
-│   │       └── ProductInfo.jsx          # Nombre, precio, descripción...
-│   │
-│   ├── hooks/                           # Custom hooks (ver sección más abajo)
-│   │   ├── useProducts.js
-│   │   └── useProduct.js
-│   │
-│   └── context/
-│       └── CartContext.jsx              # (extra) Contexto del carrito
+│   └── pages/
+│       ├── home/
+│       │   ├── Home.jsx                      # Página raíz, orquesta ProductList
+│       │   ├── components/
+│       │   │   ├── ProductList.jsx           # Grid de tarjetas, gestiona loading/error
+│       │   │   ├── ProductList.module.css
+│       │   │   ├── ProductCard.jsx           # Tarjeta individual con Link al detalle
+│       │   │   └── ProductCard.module.css
+│       │   ├── hooks/
+│       │   │   └── useProducts.jsx           # Obtiene la lista de productos
+│       │   └── services/
+│       │       └── productList.js            # Llamada axios a /products
+│       │
+│       ├── productDetail/
+│       │   ├── ProductDetail.jsx             # Página de detalle, gestiona loading/error
+│       │   ├── hooks/
+│       │   │   └── useProduct.js             # Obtiene un producto por id, maneja ERROR_TYPES
+│       │   └── services/
+│       │       └── productDetail.js          # Llamada axios a /products/:id
+│       │
+│       └── error/
+│           └── Error.jsx                     # Página 404
 │
 ├── package.json
 └── vite.config.js
 ```
 
-> Las páginas (`pages/`) son el punto de entrada de cada ruta. No deben tener lógica visual compleja — su trabajo es orquestar los componentes y pasarles datos.
-
----
-
-## Dividir bien los componentes
-
-Una de las habilidades más importantes en React es saber **cuándo extraer un componente**. Un componente debería hacer una sola cosa bien. Si tienes que poner un comentario para separar partes del JSX, probablemente ahí hay un componente nuevo esperando.
-
-### Preguntas para reflexionar
-
-Antes de escribir código, piensa en estas preguntas. No hay una única respuesta correcta, pero razonarlas te ayudará a tomar mejores decisiones.
-
-**Sobre el listado:**
-
-- `ProductList` renderiza todas las tarjetas. ¿Tiene sentido que también defina cómo se ve cada tarjeta? ¿O eso debería ser responsabilidad de otro componente?
-- ¿Qué props necesita recibir `ProductCard` para funcionar de forma independiente?
-- Si mañana quisieras mostrar las tarjetas en un slider en lugar de una cuadrícula, ¿cuántos archivos tendrías que tocar?
-
-**Sobre el detalle:**
-
-- La página de detalle tiene imagen, título, precio, descripción y stock. ¿Todo eso en un único componente o lo separarías? ¿Por qué?
-- `ProductImage` y `ProductInfo` son candidatos claros a ser componentes separados. ¿Qué props recibiría cada uno?
-- Si el diseño de la imagen cambia (tamaño, forma, borde), ¿preferirías tocar un componente específico o buscar la imagen dentro de un componente grande?
-
-**Sobre reutilización:**
-
-- ¿Hay algún elemento (por ejemplo, el precio o la etiqueta de categoría) que aparezca tanto en la tarjeta como en el detalle? ¿Tendría sentido convertirlo en un componente propio?
-- ¿Qué criterio usarías para decidir si algo va en `components/` o directamente en la página?
-
 ---
 
 ## Custom Hooks
 
-Un **custom hook** es simplemente una función de JavaScript que empieza por `use` y puede llamar a otros hooks de React (`useState`, `useEffect`, etc.).
+Cada página tiene su propio hook que encapsula la lógica de fetching. Los componentes solo reciben datos y renderizan.
 
-Sirven para **extraer lógica fuera del componente** cuando esa lógica es reutilizable o hace el componente demasiado largo. El componente se queda solo con el JSX; el hook se queda con el "cómo se obtienen los datos".
-
-**Sin custom hook** — la lógica de fetch vive dentro del componente:
-
-```jsx
-function ProductDetailPage() {
-  const { id } = useParams();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`http://localhost:3001/products/${id}`)
-      .then((res) => setProduct(res.data))
-      .catch(() => setError("Error al cargar el producto"))
-      .finally(() => setLoading(false));
-  }, [id]);
-
-  if (loading) return <p>Cargando...</p>;
-  if (error) return <p>{error}</p>;
-  return <ProductDetail product={product} />;
-}
-```
-
-**Con custom hook** — la lógica se mueve a `hooks/useProduct.js`:
+### `useProducts` — listado
 
 ```js
-// src/hooks/useProduct.js
-import { useState, useEffect } from "react";
-import axios from "axios";
+// src/pages/home/hooks/useProducts.jsx
+export const useProducts = () => {
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-export function useProduct(id) {
+  useEffect(() => {
+    const get = async () => {
+      try {
+        setIsLoading(true);
+        const products = await productList();
+        if (products) setProducts(products);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    get();
+  }, []);
+
+  return { products, isLoading, error };
+};
+```
+
+### `useProduct` — detalle
+
+El hook de detalle distingue entre errores conocidos (404) y errores genéricos usando `ERROR_TYPES`:
+
+```js
+// src/pages/productDetail/hooks/useProduct.js
+export const ERROR_TYPES = {
+  NOT_FOUND: "NOT_FOUND",
+  UNKNOWN: "UNKNOWN",
+};
+
+export const useProduct = (productId) => {
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`http://localhost:3001/products/${id}`)
-      .then((res) => setProduct(res.data))
-      .catch(() => setError("Error al cargar el producto"))
-      .finally(() => setLoading(false));
-  }, [id]);
+    const get = async () => {
+      try {
+        setIsLoading(true);
+        const product = await productDetailService(productId);
+        setProduct(product);
+      } catch (error) {
+        if (error.status === 404) {
+          setError(ERROR_TYPES.NOT_FOUND);
+        } else {
+          setError(ERROR_TYPES.UNKNOWN);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    get();
+  }, []);
 
-  return { product, loading, error };
-}
+  return { product, isLoading, error };
+};
 ```
 
-El componente queda limpio:
+El componente `ProductDetail` consume el hook y renderiza según el estado:
 
 ```jsx
-// src/pages/ProductDetailPage.jsx
-import { useParams } from "react-router-dom";
-import { useProduct } from "../hooks/useProduct";
+const { product, isLoading, error } = useProduct(productId);
 
-function ProductDetailPage() {
-  const { id } = useParams();
-  const { product, loading, error } = useProduct(id);
-
-  if (loading) return <p>Cargando...</p>;
-  if (error) return <p>{error}</p>;
-  return <ProductDetail product={product} />;
-}
+if (error === ERROR_TYPES.NOT_FOUND) return <h1>no existe...</h1>;
+if (error === ERROR_TYPES.UNKNOWN) return <h1>error...</h1>;
+if (isLoading) return <h1>Cargando...</h1>;
+return <h1>{product.name}</h1>;
 ```
-
-### Pregunta sobre custom hooks
-
-- ¿Podrías crear un hook `useProducts` (sin id) para el listado de productos? ¿Qué devolvería?
 
 ---
 
@@ -342,16 +320,16 @@ export function useCart() {
 import { CartProvider } from "./context/CartContext";
 
 <CartProvider>
-  <App />
-</CartProvider>;
+  <RouterProvider router={router} />
+</CartProvider>
 ```
 
 **Usar el contexto en cualquier componente:**
 
 ```jsx
-import { useCart } from '../context/CartContext'
+import { useCart } from "../context/CartContext";
 
-const { cart, addToCart } = useCart()
+const { cart, addToCart } = useCart();
 
 <button onClick={() => addToCart(product)}>Añadir al carrito</button>
 <p>Productos en el carrito: {cart.length}</p>
@@ -373,5 +351,3 @@ sessionStorage →  persiste solo mientras dure la pestaña
 > Investiga cómo combinar `localStorage` con `useState` o `useEffect` dentro del `CartProvider` para que el carrito se guarde y se recupere automáticamente. Es un reto que os proponemos resolver por vuestra cuenta.
 >
 > **Pista extra:** ¿podría ser esto un custom hook llamado `useLocalStorage`?
-   
- 
