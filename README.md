@@ -1,82 +1,178 @@
-# Online Shop — Tarea de Clase
+# Online Shop — React Project
 
-Proyecto de práctica para el curso de React. Consiste en una tienda online con una fake API REST que sirve productos de tecnología, y dos vistas principales: listado de productos y detalle de producto.
+Practice project for the React course. Online store with a simulated REST API (json-server) serving tech products, featuring a shopping cart system and complete checkout flow.
 
-## Requisitos previos
+## Features
 
-- Node.js 18 o superior
+- ✅ Responsive product listing with grid layout
+- ✅ Individual product detail pages
+- ✅ Shopping cart system with Context API
+- ✅ Checkout page with quantity management
+- ✅ Order completion form
+- ✅ Routing with React Router v6
+- ✅ Design system with CSS Modules and CSS variables
+- ✅ Loading and error state handling
+
+## Prerequisites
+
+- Node.js 18 or higher
 - npm
 
-## Instalación
+## Installation
 
 ```bash
 npm install
 ```
 
-## Levantar la aplicación
+## Running the application
 
 ```bash
 npm run dev
 ```
 
-Este comando levanta **dos servidores al mismo tiempo**:
+This command starts **two servers simultaneously**:
 
-| Servidor               | URL                   | Descripción            |
+| Server                 | URL                   | Description            |
 | ---------------------- | --------------------- | ---------------------- |
-| React (Vite)           | http://localhost:5173 | Aplicación frontend    |
-| Fake API (json-server) | http://localhost:3001 | API REST con productos |
+| React (Vite)           | http://localhost:5173 | Frontend application   |
+| Fake API (json-server) | http://localhost:3001 | REST API with products |
 
-> Si solo quieres levantar la API sin el frontend, puedes usar `npm run api`.
+> If you only want to run the API without the frontend, use `npm run api`.
 
 ---
 
-## Enrutado con React Router
+## Project Structure
 
-La aplicación usa `createBrowserRouter` de React Router v6. El router está definido en `src/router/router.jsx` y se monta en `main.jsx` con `RouterProvider`.
+The project follows a modular architecture where each page has its own components, hooks, and services.
 
-| Ruta               | Componente       | Descripción                     |
-| ------------------ | ---------------- | ------------------------------- |
-| `/`                | `Home`           | Listado de todos los productos  |
-| `/product/:productId` | `ProductDetail` | Detalle de un producto concreto |
-| `*`                | `Error`          | Página 404 para rutas no encontradas |
+```
+online-shop/
+├── db.json                                # Simulated database (json-server)
+├── src/
+│   ├── main.jsx                           # Entry point, mounts RouterProvider and CartProvider
+│   ├── index.css                          # Global CSS variables and reset
+│   │
+│   ├── components/                        # Shared components
+│   │   ├── Layout.jsx                     # Main layout with header and footer
+│   │   ├── Layout.module.css
+│   │   ├── Header.jsx                     # Navigation bar with logo and cart
+│   │   ├── Header.module.css
+│   │   └── ds/                            # Design System
+│   │       ├── Button.jsx                 # Reusable button
+│   │       ├── Button.module.css
+│   │       ├── Tag.jsx                    # Category tag
+│   │       └── Tag.module.css
+│   │
+│   ├── icons/                             # SVG icons as components
+│   │   └── Cart.jsx                       # Cart icon
+│   │
+│   ├── context/                           # Context API for global state
+│   │   └── CartContext.jsx                # Shopping cart context
+│   │
+│   ├── router/
+│   │   └── router.jsx                     # Route definitions with createBrowserRouter
+│   │
+│   └── pages/                             # Application pages
+│       │
+│       ├── home/                          # Home page
+│       │   ├── Home.jsx
+│       │   ├── Home.module.css
+│       │   ├── components/
+│       │   │   ├── ProductList.jsx        # Product grid with loading/error
+│       │   │   ├── ProductList.module.css
+│       │   │   ├── ProductCard.jsx        # Product card
+│       │   │   └── ProductCard.module.css
+│       │   ├── hooks/
+│       │   │   └── useProducts.jsx        # Hook to fetch products
+│       │   └── services/
+│       │       └── productList.js         # Axios service for listing
+│       │
+│       ├── productDetail/                 # Product detail
+│       │   ├── ProductDetail.jsx
+│       │   ├── ProductDetail.module.css
+│       │   ├── components/
+│       │   │   ├── ProductImage.jsx       # Product image
+│       │   │   ├── ProductImage.module.css
+│       │   │   ├── ProductInfo.jsx        # Info and buy button
+│       │   │   ├── ProductInfo.module.css
+│       │   │   ├── ProductDescription.jsx # Product description
+│       │   │   └── ProductDescription.module.css
+│       │   ├── hooks/
+│       │   │   └── useProduct.js          # Hook with typed error handling
+│       │   └── services/
+│       │       └── productDetail.js       # Axios service for detail
+│       │
+│       ├── checkout/                      # Shopping cart
+│       │   ├── Checkout.jsx
+│       │   ├── Checkout.module.css
+│       │   └── hooks/
+│       │       └── useCheckout.js         # Hook for cart management
+│       │
+│       ├── checkoutDetail/                # Order completion
+│       │   ├── CheckoutDetail.jsx
+│       │   └── CheckoutDetail.module.css
+│       │
+│       └── error/                         # 404 page
+│           └── Error.jsx
+│
+├── package.json
+└── vite.config.js
+```
 
-**Configuración del router (`src/router/router.jsx`):**
+---
+
+## Routing with React Router
+
+The application uses `createBrowserRouter` from React Router v6 with nested routes. The router is defined in `src/router/router.jsx`.
+
+### Available Routes
+
+| Route                   | Component         | Description                        |
+| ----------------------- | ----------------- | ---------------------------------- |
+| `/`                     | `Home`            | List of all products               |
+| `/product/:productId`   | `ProductDetail`   | Detail of a specific product       |
+| `/checkout`             | `Checkout`        | Shopping cart                      |
+| `/checkout-details`     | `CheckoutDetail`  | Order completion form              |
+| `*`                     | `Error`           | 404 page for routes not found      |
+
+### Router Configuration
 
 ```jsx
-import { createBrowserRouter } from "react-router-dom";
-import { Home } from "../pages/home/Home";
-import { ProductDetail } from "../pages/productDetail/ProductDetail";
-import { Error } from "../pages/error/Error";
+// src/router/router.jsx
+export const ROUTES = {
+  HOME: "/",
+  CHECKOUT: "/checkout",
+  PRODUCT_DETAIL: "/product/:productId",
+  CHECKOUT_DETAILS: "/checkout-details"
+}
 
 export const router = createBrowserRouter([
-  { path: "/", element: <Home /> },
-  { path: "/product/:productId", element: <ProductDetail /> },
-  { path: "*", element: <Error /> },
+  {
+    path: ROUTES.HOME,
+    element: <Layout />,
+    children: [
+      { path: ROUTES.HOME, element: <Home /> },
+      { path: ROUTES.PRODUCT_DETAIL, element: <ProductDetail /> },
+      { path: ROUTES.CHECKOUT, element: <Checkout /> },
+      { path: ROUTES.CHECKOUT_DETAILS, element: <CheckoutDetail /> },
+      { path: "*", element: <Error /> }
+    ]
+  }
 ]);
 ```
 
-**Montar el router en `main.jsx`:**
+### Navigation
 
-```jsx
-import { RouterProvider } from "react-router-dom";
-import { router } from "./router/router";
-
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>
-);
-```
-
-Para navegar al detalle desde una tarjeta se usa el componente `<Link>`:
+To navigate between pages:
 
 ```jsx
 import { Link } from "react-router-dom";
 
-<Link to={`product/${product.id}`}>Ver detalle</Link>
+<Link to={`/product/${product.id}`}>View detail</Link>
+<Link to="/checkout">Go to cart</Link>
 ```
 
-Para leer el `:productId` de la URL en la página de detalle se usa `useParams`:
+To read URL parameters:
 
 ```jsx
 import { useParams } from "react-router-dom";
@@ -86,13 +182,76 @@ const { productId } = useParams();
 
 ---
 
-## Peticiones HTTP con Axios
+## Context API - Shopping Cart
 
-Las peticiones están encapsuladas en archivos de servicio, separados de los hooks y los componentes.
+The shopping cart is managed through Context API, allowing cart state access from any component.
 
-**Servicio de listado (`src/pages/home/services/productList.js`):**
+### CartContext
+
+```jsx
+// src/context/CartContext.jsx
+import { createContext, useContext, useState } from "react";
+
+const CartContext = createContext();
+
+export function CartProvider({ children }) {
+  const [cart, setCart] = useState([]);
+
+  function add(product) {
+    setCart((prev) => [...prev, product]);
+  }
+
+  function remove(productId) {
+    const index = cart.findIndex((p) => p.id === productId);
+    if (index !== -1) {
+      setCart((prev) => prev.filter((_, i) => i !== index));
+    }
+  }
+
+  function removeAll(productId) {
+    setCart((prev) => prev.filter((p) => p.id !== productId));
+  }
+
+  function clear() {
+    setCart([]);
+  }
+
+  return (
+    <CartContext.Provider value={{ cart, add, remove, removeAll, clear }}>
+      {children}
+    </CartContext.Provider>
+  );
+}
+
+export function useCart() {
+  return useContext(CartContext);
+}
+```
+
+### Using the Context
+
+```jsx
+import { useCart } from "../context/CartContext";
+
+const { cart, add, remove } = useCart();
+
+// Add product to cart
+<button onClick={() => add(product)}>Buy Product</button>
+
+// View product count
+<span>{cart.length}</span>
+```
+
+---
+
+## HTTP Requests with Axios
+
+Requests are encapsulated in service files within each page.
+
+### Listing Service
 
 ```js
+// src/pages/home/services/productList.js
 import axios from "axios";
 
 export const productList = async () => {
@@ -101,9 +260,10 @@ export const productList = async () => {
 };
 ```
 
-**Servicio de detalle (`src/pages/productDetail/services/productDetail.js`):**
+### Detail Service
 
 ```js
+// src/pages/productDetail/services/productDetail.js
 import axios from "axios";
 
 export const productDetailService = async (productId) => {
@@ -114,160 +274,9 @@ export const productDetailService = async (productId) => {
 
 ---
 
-## Endpoints de la API
-
-### Productos
-
-| Método | URL                                  | Descripción                |
-| ------ | ------------------------------------ | -------------------------- |
-| GET    | `http://localhost:3001/products`     | Lista todos los productos  |
-| GET    | `http://localhost:3001/products/:id` | Obtiene un producto por ID |
-
-```
-GET http://localhost:3001/products        → lista de 10 productos
-GET http://localhost:3001/products/1      → detalle del producto con id 1
-GET http://localhost:3001/products?categoryName=Audio  → filtrar por categoría
-```
-
-### Pedidos (Orders)
-
-| Método | URL                                         | Descripción                              |
-| ------ | ------------------------------------------- | ---------------------------------------- |
-| POST   | `http://localhost:3001/orders`              | Crear un nuevo pedido                    |
-| GET    | `http://localhost:3001/orders`              | Lista todos los pedidos                  |
-| GET    | `http://localhost:3001/orders/:id`          | Obtiene un pedido por ID                 |
-| GET    | `http://localhost:3001/orders?_sort=createdAt&_order=desc` | Pedidos ordenados (más recientes primero) |
-
-**Estructura de un pedido:**
-
-```json
-{
-  "id": 1,
-  "firstName": "Luis",
-  "lastName": "Fernández",
-  "city": "Madrid",
-  "items": [
-    {
-      "productId": 1,
-      "name": "Portátil Apple MacBook Pro",
-      "price": 1299.99,
-      "quantity": 2
-    },
-    {
-      "productId": 3,
-      "name": "Sony PlayStation 5",
-      "price": 499.99,
-      "quantity": 1
-    }
-  ],
-  "total": 3099.97,
-  "createdAt": "2026-04-27T10:30:00.000Z"
-}
-```
-
-**Nota importante:** json-server genera automáticamente el `id` (autoincremental). El campo `createdAt` debe enviarse desde el cliente usando `new Date().toISOString()`.
-
-**Ejemplo de petición POST para crear un pedido:**
-
-```js
-import axios from "axios";
-
-const createOrder = async (orderData) => {
-  const response = await axios.post("http://localhost:3001/orders", {
-    firstName: orderData.firstName,
-    lastName: orderData.lastName,
-    city: orderData.city,
-    items: orderData.items,
-    total: orderData.total,
-    createdAt: new Date().toISOString()
-  });
-  return response.data;
-};
-```
-
-**Ejemplo de petición GET para listar pedidos:**
-
-```js
-import axios from "axios";
-
-const getOrders = async () => {
-  const response = await axios.get("http://localhost:3001/orders");
-  return response.data;
-};
-```
-
----
-
-## Imágenes con Picsum
-
-Las imágenes usan [picsum.photos](https://picsum.photos). Puedes cambiar las dimensiones directamente en `db.json` modificando el campo `imageUrl`:
-
-```json
-"imageUrl": "https://picsum.photos/seed/macbook/200/300"
-```
-
-El formato es: `https://picsum.photos/seed/{semilla}/{ancho}/{alto}`
-
-Ejemplos:
-
-```
-https://picsum.photos/seed/macbook/400/400   → imagen cuadrada 400x400
-https://picsum.photos/seed/macbook/600/200   → imagen apaisada
-https://picsum.photos/seed/macbook/300/500   → imagen vertical
-```
-
-> La `seed` (semilla) garantiza que siempre se sirva la misma imagen para ese producto. Si la cambias, cambia la imagen.
-
----
-
-## Estructura del proyecto
-
-Cada página tiene su propio directorio con sus componentes, hooks y servicios. La lógica de obtención de datos queda completamente separada de la vista.
-
-```
-online-shop/
-├── db.json
-├── src/
-│   ├── main.jsx                              # Punto de entrada, monta RouterProvider
-│   ├── index.css
-│   │
-│   ├── router/
-│   │   └── router.jsx                        # Definición de rutas con createBrowserRouter
-│   │
-│   └── pages/
-│       ├── home/
-│       │   ├── Home.jsx                      # Página raíz, orquesta ProductList
-│       │   ├── components/
-│       │   │   ├── ProductList.jsx           # Grid de tarjetas, gestiona loading/error
-│       │   │   ├── ProductList.module.css
-│       │   │   ├── ProductCard.jsx           # Tarjeta individual con Link al detalle
-│       │   │   └── ProductCard.module.css
-│       │   ├── hooks/
-│       │   │   └── useProducts.jsx           # Obtiene la lista de productos
-│       │   └── services/
-│       │       └── productList.js            # Llamada axios a /products
-│       │
-│       ├── productDetail/
-│       │   ├── ProductDetail.jsx             # Página de detalle, gestiona loading/error
-│       │   ├── hooks/
-│       │   │   └── useProduct.js             # Obtiene un producto por id, maneja ERROR_TYPES
-│       │   └── services/
-│       │       └── productDetail.js          # Llamada axios a /products/:id
-│       │
-│       └── error/
-│           └── Error.jsx                     # Página 404
-│
-├── package.json
-└── vite.config.js
-```
-
----
-
 ## Custom Hooks
 
-Cada página tiene su propio hook que encapsula la lógica de fetching. Los componentes solo reciben datos y renderizan.
-
-### `useProducts` — listado
+### `useProducts` — Product Listing
 
 ```js
 // src/pages/home/hooks/useProducts.jsx
@@ -295,9 +304,7 @@ export const useProducts = () => {
 };
 ```
 
-### `useProduct` — detalle
-
-El hook de detalle distingue entre errores conocidos (404) y errores genéricos usando `ERROR_TYPES`:
+### `useProduct` — Detail with Typed Errors
 
 ```js
 // src/pages/productDetail/hooks/useProduct.js
@@ -328,95 +335,199 @@ export const useProduct = (productId) => {
       }
     };
     get();
-  }, []);
+  }, [productId]);
 
   return { product, isLoading, error };
 };
 ```
 
-El componente `ProductDetail` consume el hook y renderiza según el estado:
+### `useCheckout` — Cart Management
 
-```jsx
-const { product, isLoading, error } = useProduct(productId);
+```js
+// src/pages/checkout/hooks/useCheckout.js
+export const useCheckout = () => {
+  const { cart, add, remove, removeAll, clear } = useCart();
 
-if (error === ERROR_TYPES.NOT_FOUND) return <h1>no existe...</h1>;
-if (error === ERROR_TYPES.UNKNOWN) return <h1>error...</h1>;
-if (isLoading) return <h1>Cargando...</h1>;
-return <h1>{product.name}</h1>;
+  // Groups products by id and counts quantities
+  const productsGroup = cart.reduce((acc, product) => {
+    if (acc[product.id]) {
+      acc[product.id].count++;
+    } else {
+      acc[product.id] = { ...product, count: 1 };
+    }
+    return acc;
+  }, {});
+
+  const addItem = (product) => add(product);
+  const subtractItem = (productId) => remove(productId);
+  const subtractAllItemsById = (productId) => removeAll(productId);
+  const removeAllItems = () => clear();
+
+  return {
+    productsGroup,
+    addItem,
+    subtractItem,
+    subtractAllItemsById,
+    removeAllItems,
+  };
+};
 ```
 
 ---
 
-## Extra: Contexto de pedidos (carrito)
+## API Endpoints
 
-Una vez que el listado y el detalle funcionan, puedes añadir un **contexto global** para gestionar los pedidos del usuario. La idea es tener un estado compartido accesible desde cualquier componente sin pasar props manualmente.
+### Products
 
-**Crear el contexto:**
+| Method | URL                                  | Description                |
+| ------ | ------------------------------------ | -------------------------- |
+| GET    | `http://localhost:3001/products`     | List all products          |
+| GET    | `http://localhost:3001/products/:id` | Get a product by ID        |
 
-```jsx
-// src/context/CartContext.jsx
-import { createContext, useContext, useState } from "react";
+**Examples:**
 
-const CartContext = createContext();
+```
+GET http://localhost:3001/products                        → list of 10 products
+GET http://localhost:3001/products/1                      → product with id 1
+GET http://localhost:3001/products?categoryName=Audio     → filter by category
+```
 
-export function CartProvider({ children }) {
-  const [cart, setCart] = useState([]);
+### Orders
 
-  function addToCart(product) {
-    setCart((prev) => [...prev, product]);
-  }
+| Method | URL                                         | Description                              |
+| ------ | ------------------------------------------- | ---------------------------------------- |
+| POST   | `http://localhost:3001/orders`              | Create a new order                       |
+| GET    | `http://localhost:3001/orders`              | List all orders                          |
+| GET    | `http://localhost:3001/orders/:id`          | Get an order by ID                       |
 
-  function removeFromCart(productId) {
-    setCart((prev) => prev.filter((p) => p.id !== productId));
-  }
+**Order structure:**
 
-  return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
-      {children}
-    </CartContext.Provider>
-  );
-}
-
-export function useCart() {
-  return useContext(CartContext);
+```json
+{
+  "id": 1,
+  "firstName": "John",
+  "lastName": "Doe",
+  "city": "New York",
+  "items": [
+    {
+      "productId": 1,
+      "name": "Apple MacBook Pro Laptop",
+      "price": 1299.99,
+      "quantity": 2
+    }
+  ],
+  "total": 2599.98,
+  "createdAt": "2026-04-27T10:30:00.000Z"
 }
 ```
 
-**Envolver la app con el provider:**
+**Example POST request:**
 
-```jsx
-// main.jsx
-import { CartProvider } from "./context/CartContext";
+```js
+import axios from "axios";
 
-<CartProvider>
-  <RouterProvider router={router} />
-</CartProvider>
-```
-
-**Usar el contexto en cualquier componente:**
-
-```jsx
-import { useCart } from "../context/CartContext";
-
-const { cart, addToCart } = useCart();
-
-<button onClick={() => addToCart(product)}>Añadir al carrito</button>
-<p>Productos en el carrito: {cart.length}</p>
+const createOrder = async (orderData) => {
+  const response = await axios.post("http://localhost:3001/orders", {
+    ...orderData,
+    createdAt: new Date().toISOString()
+  });
+  return response.data;
+};
 ```
 
 ---
 
-## Super Extra: Persistir el carrito al recargar (F5)
+## Design System
 
-Cuando el usuario recarga la página con F5, el estado de React se reinicia y el carrito se vacía. ¿Cómo se podría solucionar?
+The project uses a consistent design system with CSS variables and reusable components.
 
-**Pista:** el navegador tiene mecanismos de almacenamiento local que no dependen de React...
+### CSS Variables
+
+Defined in `src/index.css`:
+
+```css
+:root {
+  /* Colors */
+  --color-primary: #000000;
+  --color-bg: #ffffff;
+  --color-text: #000000;
+  --color-text-secondary: #666666;
+  
+  /* Spacing (8px scale) */
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+  
+  /* Typography */
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-2xl: 24px;
+  
+  /* Layout */
+  --max-width-content: 1200px;
+  
+  /* Transitions */
+  --transition-speed: 200ms;
+  --transition-ease: ease-in-out;
+}
+```
+
+### DS Components
+
+- **Button**: Reusable button with consistent styles
+- **Tag**: Tag for product categories
+
+---
+
+## Images with Picsum
+
+Images use [picsum.photos](https://picsum.photos). The format is:
 
 ```
-localStorage   →  persiste aunque se cierre el navegador
-sessionStorage →  persiste solo mientras dure la pestaña
+https://picsum.photos/seed/{seed}/{width}/{height}
 ```
 
-> Investiga cómo combinar `localStorage` con `useState` o `useEffect` dentro del `CartProvider` para que el carrito se guarde y se recupere automáticamente. Es un reto que os proponemos resolver por vuestra cuenta.
->
-> **Pista extra:** ¿podría ser esto un custom hook llamado `useLocalStorage`?
+**Examples:**
+
+```
+https://picsum.photos/seed/macbook/400/400   → square image 400x400
+https://picsum.photos/seed/macbook/600/200   → landscape image
+https://picsum.photos/seed/macbook/300/500   → portrait image
+```
+
+> The `seed` ensures the same image is always served for that product.
+
+---
+
+## Future Improvements
+
+- [ ] Persist cart in localStorage
+- [ ] Implement product filters by category
+- [ ] Add product search
+- [ ] Implement sorting (price, name, etc.)
+- [ ] Add order history page
+- [ ] Implement user authentication
+- [ ] Add more product details (stock, ratings)
+- [ ] Implement pagination in listing
+- [ ] Add transition animations
+- [ ] Unit and integration tests
+
+---
+
+## Technologies Used
+
+- **React 18** - UI Framework
+- **Vite** - Build tool and dev server
+- **React Router v6** - Routing
+- **Axios** - HTTP client
+- **json-server** - Simulated REST API
+- **CSS Modules** - Locally scoped styles
+- **Context API** - Global state management
+
+---
+
+## Author
+
+Project created as part of the React course - 2026
