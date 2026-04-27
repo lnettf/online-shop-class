@@ -1,0 +1,13 @@
+.item {
+    border: solid 1px black;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.counter {
+    padding: 8px;
+    background: #636363;
+    border-radius: 8px;
+    color: white;
+}

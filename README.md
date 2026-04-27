@@ -116,6 +116,8 @@ export const productDetailService = async (productId) => {
 
 ## Endpoints de la API
 
+### Productos
+
 | Método | URL                                  | Descripción                |
 | ------ | ------------------------------------ | -------------------------- |
 | GET    | `http://localhost:3001/products`     | Lista todos los productos  |
@@ -125,6 +127,73 @@ export const productDetailService = async (productId) => {
 GET http://localhost:3001/products        → lista de 10 productos
 GET http://localhost:3001/products/1      → detalle del producto con id 1
 GET http://localhost:3001/products?categoryName=Audio  → filtrar por categoría
+```
+
+### Pedidos (Orders)
+
+| Método | URL                                         | Descripción                              |
+| ------ | ------------------------------------------- | ---------------------------------------- |
+| POST   | `http://localhost:3001/orders`              | Crear un nuevo pedido                    |
+| GET    | `http://localhost:3001/orders`              | Lista todos los pedidos                  |
+| GET    | `http://localhost:3001/orders/:id`          | Obtiene un pedido por ID                 |
+| GET    | `http://localhost:3001/orders?_sort=createdAt&_order=desc` | Pedidos ordenados (más recientes primero) |
+
+**Estructura de un pedido:**
+
+```json
+{
+  "id": 1,
+  "firstName": "Luis",
+  "lastName": "Fernández",
+  "city": "Madrid",
+  "items": [
+    {
+      "productId": 1,
+      "name": "Portátil Apple MacBook Pro",
+      "price": 1299.99,
+      "quantity": 2
+    },
+    {
+      "productId": 3,
+      "name": "Sony PlayStation 5",
+      "price": 499.99,
+      "quantity": 1
+    }
+  ],
+  "total": 3099.97,
+  "createdAt": "2026-04-27T10:30:00.000Z"
+}
+```
+
+**Nota importante:** json-server genera automáticamente el `id` (autoincremental). El campo `createdAt` debe enviarse desde el cliente usando `new Date().toISOString()`.
+
+**Ejemplo de petición POST para crear un pedido:**
+
+```js
+import axios from "axios";
+
+const createOrder = async (orderData) => {
+  const response = await axios.post("http://localhost:3001/orders", {
+    firstName: orderData.firstName,
+    lastName: orderData.lastName,
+    city: orderData.city,
+    items: orderData.items,
+    total: orderData.total,
+    createdAt: new Date().toISOString()
+  });
+  return response.data;
+};
+```
+
+**Ejemplo de petición GET para listar pedidos:**
+
+```js
+import axios from "axios";
+
+const getOrders = async () => {
+  const response = await axios.get("http://localhost:3001/orders");
+  return response.data;
+};
 ```
 
 ---

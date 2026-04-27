@@ -8,7 +8,11 @@ export const Header = () => {
     const { cart } = useCart()
     return (
         <div className={style.header}>
-            <h1>Header</h1>
+            <h1>
+                <Link to={ROUTES.HOME}>
+                    Header
+                </Link>
+            </h1>
             <div>
                 <Link to={ROUTES.CHECKOUT}>
                     <CartIcon width={50} />

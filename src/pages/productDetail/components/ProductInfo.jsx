@@ -5,10 +5,10 @@ import { CartIcon } from "../../../icons/Cart"
 import style from "./ProductInfo.module.css"
 
 export const ProductInfo = ({ product }) => {
-    const { addToCart } = useCart()
+    const { add } = useCart()
 
     const handleClick = () => {
-        addToCart(product)
+        add(product)
     }
     return (
         <div >
