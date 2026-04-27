@@ -10,15 +10,15 @@ export const Header = () => {
         <div className={style.header}>
             <h1>
                 <Link to={ROUTES.HOME}>
-                    Header
+                    Shop
                 </Link>
             </h1>
-            <div>
-                <Link to={ROUTES.CHECKOUT}>
-                    <CartIcon width={50} />
-                </Link>
-                <span>{cart.length}</span>
-            </div>
+            <Link to={ROUTES.CHECKOUT} className={style.cartContainer}>
+                <CartIcon className={style.cartIcon} width={32} />
+                {cart.length > 0 && (
+                    <span className={style.cartBadge}>{cart.length}</span>
+                )}
+            </Link>
         </div>
     )
 }

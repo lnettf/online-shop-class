@@ -22,19 +22,21 @@ export const ProductList = () => {
   const { products, isLoading, error } = useProducts()
 
   if (error) {
-    return <h1>error</h1>
+    return <div className={styles.container}><div className={styles.error}>Error loading products</div></div>
   }
 
   if (isLoading) {
-    return <h1>Cargando...</h1>
+    return <div className={styles.container}><div className={styles.loading}>Cargando...</div></div>
   }
 
 
   return (
-    <div className={styles.list}>
-      {products.map((product) => {
-        return <ProductCard key={product.id} product={product} />
-      })}
+    <div className={styles.container}>
+      <div className={styles.productList}>
+        {products.map((product) => {
+          return <ProductCard key={product.id} product={product} />
+        })}
+      </div>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useCart } from "../../context/CartContext"
+import style from "./CheckoutDetail.module.css"
 
 /**
  *
@@ -52,15 +53,55 @@ export const CheckoutDetail = () => {
 
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label >
-                Nombre
-                <input type="text" name="firstName" value={form.firstName} onChange={handleChange} />
-                <input type="text" name="lastName" value={form.lastName} onChange={handleChange} />
-                <input type="text" name="city" value={form.city} onChange={handleChange} />
-            </label>
-            <input type="submit" value="Submit" />
+        <div className={style.container}>
+            <h1 className={style.title}>Checkout Details</h1>
+            <form className={style.form} onSubmit={handleSubmit}>
+                <div className={style.formGroup}>
+                    <label className={style.label} htmlFor="firstName">First Name</label>
+                    <input
+                        className={style.input}
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        value={form.firstName}
+                        onChange={handleChange}
+                        placeholder="Enter your first name"
+                        required
+                    />
+                </div>
 
-        </form>
+                <div className={style.formGroup}>
+                    <label className={style.label} htmlFor="lastName">Last Name</label>
+                    <input
+                        className={style.input}
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        value={form.lastName}
+                        onChange={handleChange}
+                        placeholder="Enter your last name"
+                        required
+                    />
+                </div>
+
+                <div className={style.formGroup}>
+                    <label className={style.label} htmlFor="city">City</label>
+                    <input
+                        className={style.input}
+                        type="text"
+                        id="city"
+                        name="city"
+                        value={form.city}
+                        onChange={handleChange}
+                        placeholder="Enter your city"
+                        required
+                    />
+                </div>
+
+                <button className={style.submitButton} type="submit">
+                    Complete Order
+                </button>
+            </form>
+        </div>
     )
 }

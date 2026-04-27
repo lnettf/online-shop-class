@@ -1,0 +1,38 @@
+.productInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.category {
+  text-transform: uppercase;
+  font-size: var(--font-size-tiny);
+  color: var(--color-text-tertiary);
+  letter-spacing: 1.5px;
+  font-weight: var(--font-weight-medium);
+}
+
+.name {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.price {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin: var(--spacing-sm) 0;
+}
+
+.stock {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.addToCartButton {
+  margin-top: auto;
+}

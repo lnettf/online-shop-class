@@ -1,12 +1,24 @@
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  padding: var(--spacing-2xl) var(--spacing-md);
 }
 
 .productDetail {
-    width: 100%;
-    border: solid 1px red;
-    display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-2xl);
+  margin-bottom: var(--spacing-2xl);
+}
+
+/* Mobile stacking */
+@media (max-width: 767px) {
+  .productDetail {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
 }
