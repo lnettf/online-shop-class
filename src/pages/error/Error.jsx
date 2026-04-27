@@ -20,14 +20,14 @@ export const Error = () => {
                 fontSize: 'var(--font-size-2xl)',
                 color: 'var(--color-text-secondary)',
                 textAlign: 'center'
-            }}>Page not found</p>
+            }}>Página no encontrada</p>
             <Link to="/" style={{
                 fontSize: 'var(--font-size-lg)',
                 color: 'var(--color-primary)',
                 textDecoration: 'underline',
                 marginTop: 'var(--spacing-md)'
             }}>
-                Back to home
+                Volver al inicio
             </Link>
         </div>
     );

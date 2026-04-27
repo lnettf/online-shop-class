@@ -7,13 +7,14 @@ import { ProductDescription } from "./components/ProductDescription";
 
 
 /**
- *
+ * Estructura de producto:
+ * {
     "id": "1",
     "name": "Portátil Apple MacBook Pro",
     "description": "Portátil de alto rendimiento con pantalla Retina de 13 pulgadas, chip Apple M1, 8 GB de RAM y 256 GB de SSD.",
     "price": 1299.99,
     "stockQuantity": 75,
-    "categoryName": "Laptops",
+    "categoryName": "Portátiles",
     "imageUrl": "https://picsum.photos/seed/macbook/200/300",
     "createdAt": "2023-12-29",
     "updatedAt": "2023-12-29"

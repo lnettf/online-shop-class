@@ -22,7 +22,7 @@ export const ProductList = () => {
   const { products, isLoading, error } = useProducts()
 
   if (error) {
-    return <div className={styles.container}><div className={styles.error}>Error loading products</div></div>
+    return <div className={styles.container}><div className={styles.error}>Error al cargar los productos</div></div>
   }
 
   if (isLoading) {

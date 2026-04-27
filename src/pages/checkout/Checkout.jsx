@@ -16,14 +16,14 @@ export const Checkout = () => {
 
     return (
         <div className={style.container}>
-            <h1 className={style.title}>Checkout</h1>
+            <h1 className={style.title}>Carrito de Compras</h1>
 
             {Object.values(productsGroup).length === 0 ? (
-                <p className={style.empty}>Your cart is empty</p>
+                <p className={style.empty}>Tu carrito está vacío</p>
             ) : (
                 <>
                     <button className={style.clearButton} onClick={removeAllItems}>
-                        Clear cart
+                        Vaciar carrito
                     </button>
 
                     <div className={style.itemsList}>
@@ -49,7 +49,7 @@ export const Checkout = () => {
                     </div>
 
                     <Link className={style.checkoutLink} to={ROUTES.CHECKOUT_DETAILS}>
-                        Continue to checkout
+                        Continuar con la compra
                     </Link>
                 </>
             )}
