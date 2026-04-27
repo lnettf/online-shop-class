@@ -22,10 +22,7 @@ export const CheckoutDetail = () => {
     const handleSubmit = (e) => {
         e.preventDefault()
 
-        const formData = new FormData(e.currentTarget);
-
-        // http
-
+        // futura llamada http
         console.log({
             id: 2323,
             ...form,
@@ -34,7 +31,7 @@ export const CheckoutDetail = () => {
                     productId: product.id,
                     name: product.name,
                     price: product.price,
-                    quantity: product.quantity, //
+                    quantity: product.quantity, // calcular este campo
                 }
             })
         })
